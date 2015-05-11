@@ -28,10 +28,10 @@ proc readByte(s: Socket): int =
   else:
     return -1
 
-proc readVersion*(s: Socket): int =
+proc readVersion(s: Socket): int =
   return s.readByte
 
-proc readMethods*(s: Socket): seq[int] =
+proc readMethods(s: Socket): seq[int] =
   var
     methods: seq[int] = @[]
     count = s.readByte - 1
@@ -39,7 +39,7 @@ proc readMethods*(s: Socket): seq[int] =
     methods.add s.readByte
   return methods
 
-proc readDestAddress*(s: Socket): string =
+proc readDestAddress(s: Socket): string =
   var
     req = ""
     len = s.recv(req, 4)
@@ -52,7 +52,7 @@ proc readDestAddress*(s: Socket): string =
       return domain
   return ""
 
-proc readDestPort*(s: Socket): Port =
+proc readDestPort(s: Socket): Port =
   var
     port = ""
     len = s.recv(port, 2)
