@@ -30,10 +30,11 @@ proc proxy*(req: SocksRequest) =
     while true:
       var info = selector.select(-1)
       for ready in info:
-        if ready.key == sourceKey and EvRead in ready.events:
-          if not pipe(req.client, destsock):
-            break pump
-        elif ready.key == destKey and EvRead in ready.events:
-          if not pipe(destsock, req.client):
-            break pump
+        if EvRead in ready.events:
+          if ready.key == sourceKey:
+            if not pipe(req.client, destsock):
+              break pump
+          elif ready.key == destKey:
+            if not pipe(destsock, req.client):
+              break pump
       sleep 1

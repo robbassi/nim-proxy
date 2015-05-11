@@ -57,17 +57,14 @@ proc readDestPort(s: Socket): Port =
     port = ""
     len = s.recv(port, 2)
   if len == 2:
-    var b = bytes port
-    return Port toInt16 b
+    return Port toInt16 bytes port
   return Port 0
 
 proc socks5_auth*(client: Socket): bool =
   if client.readVersion != 5:
     return false
-
   if not 0 in client.readMethods:
     return false
-
   client.send ($chr(5) & $chr(0))
   return true
 
@@ -75,6 +72,5 @@ proc socks5_req*(client: Socket): SocksRequest =
   let
     destaddr = client.readDestAddress
     destport = client.readDestPort
-
   client.send ($chr(5) & $chr(0).repeat(2) & $chr(1) & $chr(0).repeat(6))
   return SocksRequest(client: client, destaddr: destaddr, destport: destport)
