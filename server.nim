@@ -13,7 +13,7 @@ proc handle_req(client: Socket): bool =
     else:
       echo "auth failed"
   except SocksParseError:
-    echo "error reading packet"
+    echo "error reading packet: ", getCurrentExceptionMsg()
 
 # ignore child process signals
 signal SIGCHLD, SIG_IGN

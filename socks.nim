@@ -112,15 +112,12 @@ proc readDestPort(s: Socket): Port =
   raise newException(SocksParseError, "Invalid port")
 
 proc socks5_auth*(client: Socket): bool =
-  try:
-    if client.readVersion != 5:
-      return false
-    if not (None in client.readMethods):
-      return false
-    client.send ($chr(5) & $chr(0))
-    return true
-  except:
+  if client.readVersion != 5:
     return false
+  if not (None in client.readMethods):
+    return false
+  client.send ($chr(5) & $chr(0))
+  return true
 
 proc socks5_req*(client: Socket): SocksProxyRequest =
   let
