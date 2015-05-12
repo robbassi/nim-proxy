@@ -1,4 +1,5 @@
 from strutils import repeat
+from typetraits import name
 import sockets
 
 type
@@ -41,7 +42,7 @@ type
 template intConverter(name: expr): expr =
   converter `to name`(i: int): `name` =
     try: return `name` i
-    except: raise newException(SocksParseError, "Invalid `name`")
+    except: raise newException(SocksParseError, "Invalid " & typetraits.name name)
 
 intConverter SocksVersion
 intConverter SocksAuthMethod
