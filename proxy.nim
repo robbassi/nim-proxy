@@ -1,14 +1,15 @@
 from os import sleep
+from posix import usleep
 import sockets, selectors, parseutils, socks
 
 proc pipe(a, b: Socket): bool =
   var
-    req = ""
-    len = a.recvAsync(req, 20000)
+    buff = ""
+    len = a.recvAsync(buff, 20000)
   if len > 0:
-    var sent = b.sendAsync req
+    var sent = b.sendAsync buff
     while sent < len:
-      sent += b.sendAsync req[sent..len]
+      sent += b.sendAsync buff[sent..len]
   else:
     return false
   return true
@@ -18,14 +19,14 @@ proc proxy*(req: SocksRequest) =
     destsock = socket()
     selector = newSelector()
     events = {EvRead}
-    sourceKey, destKey: SelectorKey
-  destsock.connect req.destaddr, req.destport
+    sourceKey: SelectorKey
   sourceKey = selector.register(req.client.getFD, events, nil)
-  destKey = selector.register(destsock.getFD, events, nil)
+  selector.register(destsock.getFD, events, nil)
+  destsock.connect req.destaddr, req.destport
 
+  # make sure sockets are non-blocking
   req.client.setBlocking false
   destsock.setBlocking false
-
   block pump:
     while true:
       var info = selector.select(-1)
@@ -34,7 +35,7 @@ proc proxy*(req: SocksRequest) =
           if ready.key == sourceKey:
             if not pipe(req.client, destsock):
               break pump
-          elif ready.key == destKey:
-            if not pipe(destsock, req.client):
+          elif not pipe(destsock, req.client):
               break pump
-      sleep 1
+      # sleep for a short time to avoid high cpu for streaming connections
+      discard usleep 200
