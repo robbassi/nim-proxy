@@ -4,11 +4,16 @@ const port = Port 1080
 var s = socket()
 
 proc handle_req(client: Socket): bool =
-  if socks5_auth client:
-    var req = socks5_req client
-    echo "connecting to ", req.destaddr
-    proxy(req)
-    echo "closed connection to ", req.destaddr
+  try:
+    if socks5_auth client:
+      var req = socks5_req client
+      echo "connecting to ", req.destaddr
+      proxy(req)
+      echo "closed connection to ", req.destaddr
+    else:
+      echo "auth failed"
+  except SocksParseError:
+    echo "error reading packet"
 
 # ignore child process signals
 signal SIGCHLD, SIG_IGN

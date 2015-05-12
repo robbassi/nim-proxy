@@ -14,7 +14,7 @@ proc pipe(a, b: Socket): bool =
     return false
   return true
 
-proc proxy*(req: SocksRequest) =
+proc proxy*(req: SocksProxyRequest) =
   var
     destsock = socket()
     selector = newSelector()
