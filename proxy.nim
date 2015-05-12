@@ -1,4 +1,3 @@
-from os import sleep
 from posix import usleep
 import sockets, selectors, parseutils, socks
 
